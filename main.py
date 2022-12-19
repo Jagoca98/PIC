@@ -28,7 +28,15 @@ class PIC:
         while(True):
             # img = cv2.imread('assets/pruebaNumeros.jpeg')	
             imgBN = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+            
+            # create a CLAHE object (Arguments are optional).
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+            imgBN = clahe.apply(imgBN)
+
             ret,imthresh = cv2.threshold(imgBN,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+            cv2.imshow('BNbin' , imthresh)
+
             # ret,imthresh = cv2.threshold(imgBN,127,255,cv2.THRESH_BINARY_INV)
 
         
@@ -64,6 +72,7 @@ class PIC:
                 x,y,w,h = cv2.boundingRect(mask)
                 area = cv2.countNonZero(mask[y:y+h,x:x+w])
                 # print("Label %d at (%d, %d) size (%d x %d) area %d pixels" % (i,x,y,w,h,area))
+                
                 img_crop = imthresh[y:y+h, x:x+w]
                 img_crop = cv2.resize(img_crop, [28,28])
                 array.append(img_crop)
@@ -81,7 +90,7 @@ class PIC:
                 cv2.putText(output2,'%d'%predicted_number,(round(x+w/4), round(y+h/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1, cv2.LINE_AA)
             
             
-            cv2.imshow('WaterShed', output)
+            # cv2.imshow('WaterShed', output)
             # cv2.imshow('Boxes', output2)
             # cv2.imshow('Boxes', output2)
             if cv2.waitKey(1) & 0xFF == ord('q'):
