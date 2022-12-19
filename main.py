@@ -89,10 +89,6 @@ class PIC:
                 cv2.rectangle(output2, (x,y), (x+w,y+h), color, 1)
                 cv2.putText(output2,'%d'%predicted_number,(round(x+w/4), round(y+h/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1, cv2.LINE_AA)
             
-            
-            # cv2.imshow('WaterShed', output)
-            # cv2.imshow('Boxes', output2)
-            # cv2.imshow('Boxes', output2)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 self.kill = True
                 cv2.destroyAllWindows()
