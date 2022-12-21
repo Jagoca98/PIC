@@ -24,7 +24,7 @@ class PIC:
 
         time.sleep(2)
 
-        width, height = 350, 250
+        width, height = 720, 420
         # self.img = cv2.imread('assets/ss.jpeg')
         while(True):
             try:
@@ -71,7 +71,8 @@ class PIC:
                 output = np.zeros_like(self.img)
                 output2 = self.img.copy()
                 output3 = self.img.copy()
-                
+                original = self.img.copy()
+
                 area_array = []
 
                 # Iterate over all non-background labels
@@ -109,18 +110,21 @@ class PIC:
                 for i in corners:
                     x,y = i.ravel()
                     puntos.append([x, y])
-                    cv2.circle(output2, (x,y), 3, 255, -1)
+                    cv2.circle(original, (x,y), 3, 255, -1)
                 
-                puntos = sorted(puntos, key=lambda k: [k[1]+k[0]])
+                puntos = sorted(puntos, key=lambda k: [k[1]+2*k[0]])
                 
+                # for i in puntos:
+                #     cv2.putText(original,'%d'%i,(i[0], i[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, 255, 1, cv2.LINE_AA)
+
                 pts1 = np.float32([puntos[0], puntos[1], puntos[2], puntos[3]])
                 pts2 = np.float32([[0, 0], [0, height], [width, 0], [width, height]])
                 matrix = cv2.getPerspectiveTransform(pts1, pts2)
                 output4 = cv2.warpPerspective(self.img, matrix, (width, height))
                 output4 = output4[int(0.05*height):int(0.95*height), int(0.05*width):int(0.95*width)]
                 
-                cv2.imshow('Original', self.img)
-                cv2.imshow('Recorte', output4)
+                cv2.imshow('Original', original)
+                # cv2.imshow('Recorte', output4)
 
             ##################################################################
                 imgBN = cv2.cvtColor(output4, cv2.COLOR_BGR2GRAY)
@@ -149,7 +153,7 @@ class PIC:
                 # cv2.imshow('Sure fg', sure_fg)
 
                 unknown = cv2.subtract(sure_bg,sure_fg)
-                cv2.imshow('Unknown', unknown)
+                # cv2.imshow('Unknown', unknown)
                 # Marker labelling
                 marker_count, markers = cv2.connectedComponents(sure_fg)
                 # Add one to all labels so that sure background is not 0, but 1
@@ -188,9 +192,9 @@ class PIC:
                     cv2.putText(output6,'%d'%predicted_number,(round(x+w/4), round(y+h/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1, cv2.LINE_AA)
 
 
-                cv2.imwrite('wshseg_colors.png', output5)
-                cv2.imwrite('wshseg_boxes.png', output6)
-                cv2.imshow('wshed', output5)
+                # cv2.imwrite('wshseg_colors.png', output5)
+                # cv2.imwrite('wshseg_boxes.png', output6)
+                # cv2.imshow('wshed', output5)
                 cv2.imshow('Predicction', output6)
 
             except:
