@@ -34,7 +34,6 @@ class PIC:
         p4 = [600, 380]
         puntos_anteriores= [p1,p2,p3,p4]
         puntos_anteriores2 = puntos_anteriores
-        tolerancia = 100
         # self.img = cv2.imread('assets/ss.jpeg')
         while(True):
             try:
