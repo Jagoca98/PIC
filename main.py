@@ -142,15 +142,15 @@ class PIC:
                     # cv2.circle(original, (x,y), 3, 255, -1)
                 
                 puntos = sorted(puntos, key=lambda k: [k[1]+2*k[0]])
-                print('Puntos actuales', puntos)
+                # print('Puntos actuales', puntos)
                 
                 for i in range(4):
                     points = [round((puntos[i][0]+0.75*puntos_anteriores[i][0]+.25*puntos_anteriores2[i][0])/2), round((puntos[i][1]+0.75*puntos_anteriores[i][1]+0.25*puntos_anteriores2[i][1])/2)]
                     puntos_corrected.append(points)
 
-                print('Puntos anteriores', puntos_anteriores)
-                print('Puntos anteriores2', puntos_anteriores2)
-                print('Puntos Corregidos', puntos_corrected)
+                # print('Puntos anteriores', puntos_anteriores)
+                # print('Puntos anteriores2', puntos_anteriores2)
+                # print('Puntos Corregidos', puntos_corrected)
                 # for i in puntos:
                 #     cv2.putText(original,'%d'%i,(i[0], i[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, 255, 1, cv2.LINE_AA)
                 
