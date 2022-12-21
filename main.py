@@ -25,13 +25,22 @@ class PIC:
         time.sleep(2)
 
         width, height = 720, 420
-        sensitivity = 70
+        sensitivity = 80
+
+        puntos_anteriores = []
+        p1 = [140, 150]
+        p2 = [130, 390]
+        p3 = [600, 150]
+        p4 = [600, 380]
+        puntos_anteriores= [p1,p2,p3,p4]
+        puntos_anteriores2 = puntos_anteriores
+        tolerancia = 100
         # self.img = cv2.imread('assets/ss.jpeg')
         while(True):
             try:
                 hsv= cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
                 
-                cv2.imshow('Original', self.img)
+                # cv2.imshow('Original', self.img)
 
 
                 lower_white = np.array([0, 0, 255-sensitivity])
@@ -42,7 +51,7 @@ class PIC:
                 res = cv2.bitwise_and(self.img,self.img, mask= maskwhite)
 
                 # cv2.imshow('HSV', maskwhite)
-                cv2.imshow('aa',res)
+                # cv2.imshow('aa',res)
 
                 res = cv2.medianBlur(res, 5)
          
@@ -56,13 +65,13 @@ class PIC:
 
                 kernel = np.ones((3,3),np.uint8)
                 dilation = cv2.dilate(canny.copy(),kernel,iterations = 3)
-                cv2.imshow('dilate', dilation)
+                # cv2.imshow('dilate', dilation)
                 dilation = cv2.medianBlur(dilation, 3)
-                cv2.imshow('dilate2', dilation)
+                # cv2.imshow('dilate2', dilation)
                 opening = cv2.morphologyEx(dilation,cv2.MORPH_OPEN,kernel, iterations = 3)
                 # closing = cv2.morphologyEx(dilation, cv2.MORPH_CLOSE, kernel, iterations = 10)
 
-                cv2.imshow('opened', opening)
+                # cv2.imshow('opened', opening)
 
                 imthresh = cv2.medianBlur(opening, 3)
 
@@ -125,19 +134,37 @@ class PIC:
                 corners = np.int0(corners)
 
                 puntos = []
+                puntos_corrected = []
 
                 # if(corners.size ==4):
                 for i in corners:
                     x,y = i.ravel()
                     puntos.append([x, y])
-                    cv2.circle(original, (x,y), 3, 255, -1)
+                    # cv2.circle(original, (x,y), 3, 255, -1)
                 
                 puntos = sorted(puntos, key=lambda k: [k[1]+2*k[0]])
+                print('Puntos actuales', puntos)
                 
+                for i in range(4):
+                    points = [round((puntos[i][0]+0.75*puntos_anteriores[i][0]+.25*puntos_anteriores2[i][0])/2), round((puntos[i][1]+0.75*puntos_anteriores[i][1]+0.25*puntos_anteriores2[i][1])/2)]
+                    puntos_corrected.append(points)
+
+                print('Puntos anteriores', puntos_anteriores)
+                print('Puntos anteriores2', puntos_anteriores2)
+                print('Puntos Corregidos', puntos_corrected)
                 # for i in puntos:
                 #     cv2.putText(original,'%d'%i,(i[0], i[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, 255, 1, cv2.LINE_AA)
+                
+                puntos_anteriores2 = puntos_anteriores
+                puntos_anteriores = puntos_corrected
+                
 
-                pts1 = np.float32([puntos[0], puntos[1], puntos[2], puntos[3]])
+                for i in puntos_anteriores:
+                    cv2.circle(original, (i[0],i[1]), 3, 255, -1)
+
+
+                # pts1 = np.float32([puntos[0], puntos[1], puntos[2], puntos[3]])
+                pts1 = np.float32([puntos_corrected[0], puntos_corrected[1], puntos_corrected[2], puntos_corrected[3]])
                 pts2 = np.float32([[0, 0], [0, height], [width, 0], [width, height]])
                 matrix = cv2.getPerspectiveTransform(pts1, pts2)
                 output4 = cv2.warpPerspective(self.img, matrix, (width, height))
@@ -153,7 +180,7 @@ class PIC:
                 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
                 imgBN = clahe.apply(imgBN)
 
-                ret,imthresh_folio = cv2.threshold(imgBN,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+                # ret,imthresh_folio = cv2.threshold(imgBN,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
                 ret,imthresh_folio = cv2.threshold(imgBN,150,255,cv2.THRESH_BINARY_INV)
 
                 # cv2.imshow('BNbin' , imthresh_folio)
@@ -209,7 +236,7 @@ class PIC:
                     color = np.uint8(np.random.randint(0, 255 + 1)).tolist()
                     output5[mask!=0] = color
                     cv2.rectangle(output6, (x,y), (x+w,y+h), color, 1)
-                    cv2.putText(output6,'%d'%predicted_number,(round(x+w/4), round(y+h/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1, cv2.LINE_AA)
+                    cv2.putText(output6,'%d'%predicted_number,(round(x), round(y+h)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1, cv2.LINE_AA)
 
 
                 # cv2.imwrite('wshseg_colors.png', output5)
